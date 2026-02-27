@@ -1,0 +1,45 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: publish
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1.15.2
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Test
+        run: cargo test
+
+      - name: Verify tag matches Cargo.toml version
+        run: |
+          VERSION=$(grep '^version *= *"' Cargo.toml | head -1 | sed -E 's/version *= *"([^"]+)"/\1/')
+          TAG=${GITHUB_REF#refs/tags/v}
+
+          echo "Cargo.toml version: $VERSION"
+          echo "Git tag version: $TAG"
+
+          if [ "$VERSION" != "$TAG" ]; then
+            echo "Error: Tag version does not match Cargo.toml version"
+            exit 1
+          fi
+
+      - name: Dry run
+        run: cargo publish --dry-run
+
+      - name: Publish crate
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
