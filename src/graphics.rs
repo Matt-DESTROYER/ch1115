@@ -1,6 +1,10 @@
 use display_interface::WriteOnlyDataCommand;
 use embedded_graphics_core::{
-    Pixel, draw_target::DrawTarget, geometry::{OriginDimensions, Point, Size}, pixelcolor::BinaryColor, primitives::Rectangle,
+    Pixel,
+    draw_target::DrawTarget,
+    geometry::{OriginDimensions, Point, Size},
+    pixelcolor::BinaryColor,
+    primitives::Rectangle,
 };
 use embedded_hal::digital::OutputPin;
 
